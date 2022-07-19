@@ -31,7 +31,7 @@ type Parser struct{
 	ini map[string]map[string]string
 }
 
-func (p *Parser)LoadFromFile(filename string) (){
+func (p *Parser)LoadFromFile(filename string)(err error){
 
 	b, err := os.ReadFile(filename)
 	if err != nil {
@@ -40,6 +40,7 @@ func (p *Parser)LoadFromFile(filename string) (){
 	x := string(b) 
 
 	p.LoadFromString(x)
+	return err
 }
 
 
@@ -52,15 +53,16 @@ func (p *Parser)LoadFromFile(filename string) (){
 	}
 	return r
 }
-func (p *Parser) LoadFromString(content string)( ) {
+func (p *Parser) LoadFromString(content string)(err error ) {
 
 
-	p.ini=loadString(content)
+	p.ini , err=loadString(content)
 
+	return err
 }
 
 
-func loadString(content string)( x map[string]map[string]string){
+func loadString(content string)( x map[string]map[string]string,err error){
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	finalmap := make(map[string]map[string]string)
 	section := ""
@@ -91,7 +93,7 @@ func loadString(content string)( x map[string]map[string]string){
 		}
 	}
 
-	return finalmap
+	return finalmap , err
 }
 func getline(line string)(name string){
 
@@ -110,7 +112,7 @@ func getline(line string)(name string){
 	}
  return
 }
-// func getsection(line string)()
+
 func (p *Parser)GetSectionNames()(arr []string){
 
 	for key := range p.ini {
@@ -151,7 +153,9 @@ func (p *Parser) ToString()(final string){
     } else {
         fmt.Println(string(jsonStr))
     }
+
 	return string(jsonStr)
+
 }
 
 func (p *Parser) SaveToFile(finalstr string)(err error){
@@ -182,7 +186,7 @@ func main(){
 	
 	fmt.Println(ds.GetSectionNames())
 	fmt.Println(ds.Get("[owner]","organization"))
-
+   
 	// ds.GetSectionNames()
 
 }
