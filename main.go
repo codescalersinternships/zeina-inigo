@@ -153,7 +153,7 @@ func (p *Parser) ToString()(final string){
     } else {
         fmt.Println(string(jsonStr))
     }
-
+    p.SaveToFile(string(jsonStr))
 	return string(jsonStr)
 
 }
@@ -187,7 +187,7 @@ func main(){
 	fmt.Println(ds.GetSectionNames())
 	fmt.Println(ds.Get("[owner]","organization"))
    
-	// ds.GetSectionNames()
+	ds.ToString() 
 
 }
 
