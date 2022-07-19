@@ -106,5 +106,27 @@ t.Run( content , func(t *testing.T){
 	})
 }
 
+func TestSet(t *testing.T){
+	t.Run( content , func(t *testing.T){
+			assertCorrectMessage := func (t testing.TB, got, want string)  {
+	
+			t.Helper()
+			if got != want{
+				t.Errorf("got %q want %q" , got, want)
+			}
+			
+		}
+		parser:= Parser{}
+		parser.LoadFromFile("file.txt")
+			section := "owner"
+			key:="name"
+			parser.Set(section,key,"zeina")
+			got := parser.Get(section,key)
+			want := "zeina"
+			
+			assertCorrectMessage(t,got,want)
+		})
+	}
+
 	
 
