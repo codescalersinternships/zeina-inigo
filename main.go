@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -30,7 +31,7 @@ type Parser struct{
 	ini map[string]map[string]string
 }
 
-func (p *Parser)LoadFromFile(filename string) (str string){
+func (p *Parser)LoadFromFile(filename string) (){
 
 	b, err := os.ReadFile(filename)
 	if err != nil {
@@ -38,36 +39,10 @@ func (p *Parser)LoadFromFile(filename string) (str string){
     }
 	x := string(b) 
 
-	return x
+	p.LoadFromString(x)
 }
-func Keys[M ~map[K]V, K comparable, V any](m M) []K {
-    r := make([]K, 0, len(m))
-    for k := range m {
-        r = append(r, k)
-    }
-    return r
-}
-func removeLinesContainingcomments(input string, toRemove []string) string {
-	if !strings.HasSuffix(input, "\n") {
-	  input += "\n"
-	}
-  
-	lines := strings.Split(input, "\n")
-  
-	for i, line := range lines {
-	  for _, rm := range toRemove {
-		if strings.Contains(line, rm) {
-		  lines = append(lines[:i], lines[i+1:]...)
-		}
-	  }
-	}
-  
-	input = strings.Join(lines, "\n")
-	input = strings.TrimSpace(input)
-	input += "\n"
-  
-	return input
-  }
+
+
   func removeEmptyStrings(s []string) []string {
 	var r []string
 	for _, str := range s {
@@ -83,67 +58,67 @@ func (p *Parser) LoadFromString(content string)( ) {
 	p.ini=loadString(content)
 
 }
-func loadString(content string)( x map[string]map[string]string) {
-    toRemove := []string{";"}
-	res := removeLinesContainingcomments(content,toRemove )
-    
-     println(res)
-	 rest := strings.Split(res," ") 
-    fmt.Println(rest)
-	 rest = removeEmptyStrings(rest)
-	 
-	 ress := make(map[string]map[string]string)
-	 
-	 for i ,s := range rest{
-	  fmt.Println(i,s)
-	 }
 
-	 
-	
-	 for i, s := range rest {
-		fmt.Println(i, s)
-		result := []rune(s)
-		var sectionnn string
-		firstcharacter := string(result[0:1])
 
-		if firstcharacter == "["{
-			ress[s]=make(map[string]string)
-			sectionnn = s
+func loadString(content string)( x map[string]map[string]string){
+	scanner := bufio.NewScanner(strings.NewReader(content))
+	finalmap := make(map[string]map[string]string)
+	section := ""
+    for scanner.Scan(){
+		line:=getline(scanner.Text())
+        key:= ""
+		value := ""
+		if line == "section"{
+			result := strings.Split(scanner.Text()," ") 
+			//fmt.Println(result)
+			result = removeEmptyStrings(result)
 			
-			println(sectionnn)
+			result[0] =strings.Replace(result[0],"[","",-1)
+			result[0] =strings.Replace(result[0],"]","",-1)
+			section=result[0]
+            finalmap[section]=make(map[string]string)
+
 		}
-		fmt.Println(ress)
-		
-	
-		if rest[i+1] =="="{
-			
-			
-			//rest[i+1] = ress[sectionnn]
-			
-			
-			//ress[sectionnn][s]= rest[i+1]
 
-            println(rest[i-1])
+		if line == "key and value"{
+			result := strings.Split(scanner.Text(),"=")
+			result = removeEmptyStrings(result)
+            key = strings.TrimSpace(result[0])
+			value =strings.TrimSpace(result[1])
+			finalmap[section][key]=value
+
+          
 		}
-		
-		
 	}
-	 fmt.Println(ress)
 
-	 println("ssss")
-	
-	
-	return ress
+	return finalmap
 }
+func getline(line string)(name string){
 
+	if strings.Contains(line,"[") && strings.Contains(line,"]"){
+		name= "section"
+		return name 
 
+	}
+    if strings.Contains(line,"=") {
+       name="key and value"
+	   return name
+	}
+	if strings.Contains(line,";"){
+      name= "comment"
+	  return name
+	}
+ return
+}
+// func getsection(line string)()
 func (p *Parser)GetSectionNames()(arr []string){
 
-	
-	strKeys := Keys(p.ini)
-
+	for key := range p.ini {
+		arr = append(arr, key)
+	}
+	return arr
    
-  return strKeys
+  
 }
 
 func (p *Parser)GetSections()(sections map[string]map[string]string){
@@ -154,8 +129,8 @@ func (p *Parser)GetSections()(sections map[string]map[string]string){
 }
 func (p *Parser) Get(section string,key string) (value string){
 	
-    value = p.ini[section][key]
-	return value
+    values := p.ini[section][key]
+	return values
 
 }
 
@@ -196,14 +171,19 @@ func (p *Parser) SaveToFile(finalstr string)(err error){
 
 func main(){
 	
-	 fmt.Println(loadString(contentt))
+	//fmt.Println(LoadFromString(contentt))
+	// fmt.Println(loadString(contentt))
 	 ds := Parser{}
+    ds.LoadFromFile("file.txt")
 
-	ds.LoadFromFile("file.txt")
+	 //ds.LoadFromString(contentt)
+	 fmt.Println(ds)
 
-	fmt.Println(ds.GetSections())
+	
+	fmt.Println(ds.GetSectionNames())
+	fmt.Println(ds.Get("[owner]","organization"))
 
-	ds.GetSectionNames()
+	// ds.GetSectionNames()
 
 }
 
