@@ -11,21 +11,6 @@ import (
 
 
 
-const contentt = ` ; last modified 1 April 2001 by John Doe
-
-                     [owner]
-                     name = John Doe
-                     organization = Acme Widgets Inc.
-
-				   ; use IP address in case network name resolution is not working
-
-                     [database]   
-                    server = 192.0.2.62     
-                    port = 143
-                    file = payroll.dat
-
-			    `
-
 
 type Parser struct{
 	ini map[string]map[string]string
@@ -172,22 +157,4 @@ func (p *Parser) SaveToFile(finalstr string)(err error){
 }
 
 
-
-// func main(){
-	
-// 	//fmt.Println(LoadFromString(contentt))
-// 	// fmt.Println(loadString(contentt))
-// 	 ds := Parser{}
-//     ds.LoadFromFile("file.txt")
-
-// 	 //ds.LoadFromString(contentt)
-// 	 fmt.Println(ds)
-
-	
-// 	fmt.Println(ds.GetSectionNames())
-// 	fmt.Println(ds.Get("[owner]","organization"))
-   
-// 	ds.ToString() 
-
-// }
 
